@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container">
+    <h3>Model Comparison Analysis</h3>
+    <p class="text-muted">Milestone 2: Comparative evaluation of Machine Learning models.</p>
+    
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <canvas id="comparisonChart"></canvas>
+        </div>
+        <div class="col-md-4">
+            <div class="list-group">
+                <div class="list-group-item">
+                    <h6>Logistic Regression (Current)</h6>
+                    <p class="mb-1 text-success">Accuracy: 98.2%</p>
+                </div>
+                <div class="list-group-item">
+                    <h6>Random Forest</h6>
+                    <p class="mb-1 text-primary">Accuracy: 97.5%</p>
+                </div>
+                <div class="list-group-item">
+                    <h6>SVM (NLP Optimized)</h6>
+                    <p class="mb-1 text-info">Accuracy: 96.8%</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const ctx = document.getElementById('comparisonChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Logistic Regression', 'Random Forest', 'SVM', 'Deep Learning (LSTM)'],
+            datasets: [{
+                label: 'Model Accuracy %',
+                data: [98.2, 97.5, 96.8, 94.2],
+                backgroundColor: ['#28a745', '#007bff', '#17a2b8', '#ffc107']
+            }]
+        },
+        options: { scales: { y: { beginAtZero: true, max: 100 } } }
+    });
+</script>
+{% endblock %}

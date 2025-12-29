@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3>System Retraining Logs</h3>
+    <a href="/admin_dashboard" class="btn btn-secondary btn-sm">Back to Dashboard</a>
+</div>
+
+<div class="card shadow-sm">
+    <table class="table table-hover mb-0">
+        <thead class="table-dark">
+            <tr>
+                <th>Log ID</th>
+                <th>Timestamp</th>
+                <th>Records Used</th>
+                <th>Final Accuracy</th>
+                <th>Source</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <td>#{{ log.id }}</td>
+                <td>{{ log.timestamp }}</td>
+                <td>{{ log.record_count }}</td>
+                <td><span class="badge bg-success">{{ log.accuracy }}%</span></td>
+                <td>{{ log.training_source }}</td>
+                <td><span class="text-success">● Active</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="mt-4 p-3 bg-light border rounded">
+    <h6>Admin Action:</h6>
+    <p class="small text-muted">Retraining is triggered automatically when 100 new flagged posts are reached, or can be forced via CLI.</p>
+</div>
+{% endblock %}

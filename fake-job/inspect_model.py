@@ -1,0 +1,11 @@
+import os
+for fname in ['fake_job_model.pkl', 'tfidf_vectorizer.pkl']:
+    print("----", fname)
+    if os.path.exists(fname):
+        size = os.path.getsize(fname)
+        print("size:", size, "bytes")
+        with open(fname, 'rb') as f:
+            head = f.read(64)
+        print("first 64 bytes:", head)
+    else:
+        print("NOT FOUND")

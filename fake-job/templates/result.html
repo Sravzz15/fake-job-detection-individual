@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-dark text-white">
+                Analysis Result
+            </div>
+            <div class="card-body text-center">
+                <p class="text-muted">The system has classified this posting as:</p>
+                <h1 class="display-4 {% if prediction == 'Fake Job' %}text-danger{% else %}text-success{% endif %}">
+                    {{ prediction }}
+                </h1>
+                
+                <div class="my-4">
+                    <h5>Confidence Score</h5>
+                    <div class="progress" style="height: 30px;">
+                        <div class="progress-bar {% if prediction == 'Fake Job' %}bg-danger{% else %}bg-success{% endif %}" 
+                             role="progressbar" style="width: {{ confidence }}%;">
+                             {{ confidence }}%
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-light border">
+                    <small>Processed using TF-IDF Vectorization and Logistic Regression.</small>
+                </div>
+                
+                <a href="/scanner" class="btn btn-outline-secondary">Scan Another</a>
+                <button class="btn btn-warning">Flag Result</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

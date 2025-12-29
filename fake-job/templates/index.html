@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobCheck </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f3f4f9; color: #334155; font-family: 'Inter', sans-serif; }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white; padding: 80px 0; border-radius: 0 0 50px 50px;
+        }
+
+        .main-card {
+            background: #ffffff; border: none; border-radius: 24px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            margin-top: -60px; padding: 40px;
+        }
+
+        .form-control {
+            border: 2px solid #e2e8f0; border-radius: 16px; padding: 20px;
+            font-size: 1.1rem; transition: 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #4f46e5; box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        .btn-analyze {
+            background: #4f46e5; color: white; border: none; border-radius: 16px;
+            padding: 18px; font-weight: 700; letter-spacing: 1px; transition: 0.3s;
+        }
+
+        .btn-analyze:hover {
+            background: #4338ca; transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4);
+        }
+
+        #result_section { display: none; }
+        
+        .result-card {
+            border-radius: 20px; border: none;
+            background: #ffffff; padding: 30px;
+        }
+
+        .badge-confidence {
+            font-size: 0.9rem; background: #e0e7ff; color: #4338ca;
+            padding: 8px 16px; border-radius: 50px; font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hero-section text-center">
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-3"><i class="fas fa-user-shield me-2"></i>JobCheck</h1>
+            
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="main-card mb-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="fw-bold mb-0">Analysis Tool</h4>
+                        <a href="/admin_login" class="text-decoration-none text-muted small"><i class="fas fa-lock me-1"></i> Admin Login</a>
+                    </div>
+                    
+                    <label class="text-secondary small fw-bold mb-2">PASTE JOB DESCRIPTION BELOW</label>
+                    <textarea id="job_input" class="form-control mb-4" rows="8" placeholder="Enter the full text of the job posting..."></textarea>
+                    
+                    <button id="check_btn" onclick="runAI()" class="btn btn-analyze w-100">
+                        <i class="fas fa-bolt me-2"></i> RUN VERIFICATION
+                    </button>
+                </div>
+
+                <div id="result_section" class="mb-5">
+                    <div class="result-card shadow-sm text-center border">
+                        <span class="badge-confidence mb-3 d-inline-block"> CONFIDENCE SCORE: <span id="conf_val">0</span>%</span>
+                        <h2 id="prediction_label" class="display-5 fw-bold mb-3"></h2>
+                        
+                        <div class="progress mb-4" style="height: 12px; border-radius: 10px;">
+                            <div id="progress_bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"></div>
+                        </div>
+
+                        <p id="detail_msg" class="text-secondary mb-4"></p>
+                        
+                        <div class="d-flex justify-content-center gap-2">
+                            <button onclick="window.location.reload()" class="btn btn-outline-secondary px-4 rounded-pill">Clear & Reset</button>
+                            <button onclick="alert('Thank you for flagging!')" class="btn btn-outline-danger px-4 rounded-pill">Flag Error</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+    async function runAI() {
+        const text = document.getElementById('job_input').value;
+        const btn = document.getElementById('check_btn');
+        
+        if(!text.trim()) {
+            alert("Please paste a job description first!");
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> PROCESSING NLP...';
+
+        try {
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({text: text})
+            });
+            const data = await response.json();
+
+            // Reveal Results
+            document.getElementById('result_section').style.display = 'block';
+            const label = document.getElementById('prediction_label');
+            const bar = document.getElementById('progress_bar');
+            
+            label.innerText = data.prediction;
+            label.className = data.prediction === "Fake Job" ? "display-5 fw-bold text-danger" : "display-5 fw-bold text-success";
+            
+            document.getElementById('conf_val').innerText = data.confidence;
+            bar.style.width = data.confidence + '%';
+            bar.className = data.prediction === "Fake Job" ? "progress-bar bg-danger" : "progress-bar bg-success";
+            
+            document.getElementById('detail_msg').innerText = "Our Logistic Regression model has classified this posting as " + data.prediction + ".";
+
+            // Scroll to result
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+
+        } catch (error) {
+            alert("Error connecting to server.");
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-bolt me-2"></i> RUN AI VERIFICATION';
+        }
+    }
+    </script>
+</body>
+</html>
